@@ -1,6 +1,8 @@
 class MoviesController < ApplicationController
 	def index
-		@movies = Movie.all.sort_by &:title
+		@movies = Movie.all
+		sort = params[:sort] || session[:sort]
+		sort == 'title' ? ordering = {:order => :title} : ordering = {:order => :release_date}
 	end
 
 	def edit		
@@ -42,7 +44,7 @@ class MoviesController < ApplicationController
 	private
 
 	def movie_params
-		params.require(:movie).permit(:title, :rating, :description, :release_date)
+		params.require(:movie).permit(:title, :rating, :description, :release_date,:sort)
 	end
 
 	
