@@ -1,8 +1,11 @@
 class MoviesController < ApplicationController
+	def initialize
+		@all_ratings=Movie.all_ratings
+	end
 	def index
-		@movies = Movie.all
-		sort = params[:sort] || session[:sort]
-		sort == 'title' ? ordering = {:order => :title} : ordering = {:order => :release_date}
+		@movies = Movie.all.order(params[:sort])
+		
+		
 	end
 
 	def edit		
@@ -40,6 +43,7 @@ class MoviesController < ApplicationController
 	  flash[:notice] = "Movie #{@movie.title} was sucessfully deleted."
 	  redirect_to movies_path
 	end
+
 
 	private
 
