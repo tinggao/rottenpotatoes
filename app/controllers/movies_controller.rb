@@ -1,11 +1,12 @@
 class MoviesController < ApplicationController
+
 	def initialize
 		@all_ratings=Movie.all_ratings
+		super
 	end
+
 	def index
-		@movies = Movie.all.order(params[:sort])
-		
-		
+		@movies = Movie.all.order(params[:sort])		
 	end
 
 	def edit		
