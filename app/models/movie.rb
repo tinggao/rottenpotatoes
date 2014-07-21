@@ -1,8 +1,8 @@
 class Movie < ActiveRecord::Base
 	def self.all_ratings
-		Movie.all.select(:rating).group(:rating).map(&:rating)
+		['G','PG','PG-13','R','NC-17']
 	end
-	def self.filter_by_rating(rating)
-		Movie.all.select(rating)
+	def self.filter_by_ratings(ratings)
+		ratings.collect{|rating| Movie.all.where(:rating => rating)}
 	end
 end

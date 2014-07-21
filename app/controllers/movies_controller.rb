@@ -1,12 +1,22 @@
 class MoviesController < ApplicationController
 
 	def initialize
-		@all_ratings=Movie.all_ratings
+		@all_ratings = Movie.all_ratings	
 		super
 	end
 
 	def index
-		@movies = Movie.all.order(params[:sort])		
+		@current_ratings = @all_ratings
+		@movies = Movie.all
+		@sort = sort_by
+		if params[:rating]
+			@current_ratings = params[:rating]
+			@movies = @movies.filter_by_ratings(params[:rating])
+		end
+		if @sort
+			@movies = @movies.order(@sort)
+		end
+
 	end
 
 	def edit		
@@ -52,5 +62,8 @@ class MoviesController < ApplicationController
 		params.require(:movie).permit(:title, :rating, :description, :release_date,:sort)
 	end
 
+	def sort_by
+		%w{title, release_date}.include?(params[:order_by]) ? params[:order_by] : nil
+	end
 	
 end

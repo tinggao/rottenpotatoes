@@ -1,19 +1,19 @@
 %h1 All Movies
 
-= form_tag movies_path, :method => :get do
+= form_tag movies_path, :method => :get, :id => 'ratings_form'  do
   Includes:
   -@all_ratings.each do |rating|
-    = check_box_tag "rating#{rating}"
+    = check_box_tag 'ratings[]', rating, :default => 1
     = rating
-  = submit_tag "Refresh"
+  = submit_tag "Refresh", :id => 'ratings_submit'
   
 %table#movies
   %thead
     %tr
       %th Row Number
-      %th{:class => 'hilite'}= link_to 'Title',:sort => :title, :id => 'title_header'
+      %th{:class => @sort=='title' ? 'hilite' : ''}= link_to 'Title',:order_by => :title, :id => 'title_header'
       %th Rating
-      %th{:class => 'hilite'}= link_to "Release Date", :sort => :release_date, :id => 'release_date_header'
+      %th{:class => @sort=='release_date' ? 'hilite' : ''}= link_to "Release Date", :order_by => :release_date, :id => 'release_date_header'
       %th More Info
       %th Edit Movie
       %th Delete Movie
