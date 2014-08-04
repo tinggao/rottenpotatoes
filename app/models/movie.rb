@@ -3,6 +3,6 @@ class Movie < ActiveRecord::Base
 		['G','PG','PG-13','R','NC-17']
 	end
 	def self.filter_by_ratings(ratings)
-		ratings.collect{|rating| Movie.all.where(:rating => rating)}
+		ratings.collect{|rating| self.where(:rating => rating)}.first
 	end
 end

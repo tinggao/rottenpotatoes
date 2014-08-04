@@ -6,17 +6,11 @@ class MoviesController < ApplicationController
 	end
 
 	def index
-		@current_ratings = @all_ratings
-		@movies = Movie.all
-		@sort = sort_by
-		if params[:rating]
-			@current_ratings = params[:rating]
-			@movies = @movies.filter_by_ratings(params[:rating])
-		end
-		if @sort
-			@movies = @movies.order(@sort)
-		end
-
+		session[:ratings] ||= []
+		params[:ratings] ? session[:ratings] = params[:ratings] : session[:ratings] = @all_ratings
+		@movies = Movie.all	
+		@movies = @movies.filter_by_ratings(session[:ratings])
+		@movies = @movies.order(sort_column) if sort_column
 	end
 
 	def edit		
@@ -24,10 +18,10 @@ class MoviesController < ApplicationController
 	end
 
 	def update
-	  @movie = Movie.find params[:id]
-	  @movie.update_attributes!(movie_params)
-	  flash[:notice] = "#{@movie.title} was successfully updated."
-	  redirect_to movie_path(@movie)
+		@movie = Movie.find params[:id]
+		@movie.update_attributes!(movie_params)
+		flash[:notice] = "#{@movie.title} was successfully updated."
+		redirect_to movie_path(@movie)
 	end
 
 	def show
@@ -44,26 +38,30 @@ class MoviesController < ApplicationController
 	def create		
 		@movie = Movie.new(movie_params)
 		@movie.save!
-		flash[:notice] = "#{@movie.title} was sucessfully created"
-		redirect_to movie_path(@movie)
+		respond_to do |client_wants|
+			client_wants.html { flash[:notice] = "#{@movie.title} was sucessfully created"
+								redirect_to movie_path(@movie)
+							  }
+			client_wants.xml {render :xml => @movie.to_xml}
+		end
 	end
 
 	def destroy
-	  @movie = Movie.find(params[:id])
-	  @movie.destroy
-	  flash[:notice] = "Movie #{@movie.title} was sucessfully deleted."
-	  redirect_to movies_path
+		@movie = Movie.find(params[:id])
+		@movie.destroy
+		flash[:notice] = "Movie #{@movie.title} was sucessfully deleted."
+		redirect_to movies_path
 	end
 
 
 	private
 
 	def movie_params
-		params.require(:movie).permit(:title, :rating, :description, :release_date,:sort)
+		params.require(:movie).permit(:title, :ratings, :description, :release_date,:sort)
 	end
 
-	def sort_by
-		%w{title, release_date}.include?(params[:order_by]) ? params[:order_by] : nil
+	def sort_column
+		%w{title, release_date}.include?(params[:sort]) ? params[:sort] : nil
 	end
 	
 end
